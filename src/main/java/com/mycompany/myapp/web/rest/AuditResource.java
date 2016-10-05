@@ -76,7 +76,7 @@ public class AuditResource {
      */
     @RequestMapping(value = "/{id:.+}",
         method = RequestMethod.GET)
-    public ResponseEntity<AuditEvent> get(@PathVariable String id) {
+    public ResponseEntity<AuditEvent> get(@PathVariable Long id) {
         return auditEventService.find(id)
                 .map((entity) -> new ResponseEntity<>(entity, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));

@@ -32,7 +32,7 @@ public interface UserMapper {
 
     List<User> userDTOsToUsers(List<UserDTO> userDTOs);
 
-    default User userFromId(String id) {
+    default User userFromId(Long id) {
         if (id == null) {
             return null;
         }

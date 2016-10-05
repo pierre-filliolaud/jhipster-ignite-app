@@ -6,9 +6,9 @@
         .controller('RegisterController', RegisterController);
 
 
-    RegisterController.$inject = ['$translate', '$timeout', 'Auth', 'LoginService'];
+    RegisterController.$inject = [ '$timeout', 'Auth', 'LoginService'];
 
-    function RegisterController ($translate, $timeout, Auth, LoginService) {
+    function RegisterController ($timeout, Auth, LoginService) {
         var vm = this;
 
         vm.doNotMatch = null;
@@ -25,7 +25,7 @@
             if (vm.registerAccount.password !== vm.confirmPassword) {
                 vm.doNotMatch = 'ERROR';
             } else {
-                vm.registerAccount.langKey = $translate.use();
+                vm.registerAccount.langKey =  'en' ;
                 vm.doNotMatch = null;
                 vm.error = null;
                 vm.errorUserExists = null;

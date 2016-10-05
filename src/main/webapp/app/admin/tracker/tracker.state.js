@@ -13,7 +13,7 @@
             url: '/tracker',
             data: {
                 authorities: ['ROLE_ADMIN'],
-                pageTitle: 'tracker.title'
+                pageTitle: 'Real-time user activities'
             },
             views: {
                 'content@': {
@@ -21,12 +21,6 @@
                     controller: 'JhiTrackerController',
                     controllerAs: 'vm'
                 }
-            },
-            resolve: {
-                mainTranslatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
-                    $translatePartialLoader.addPart('tracker');
-                    return $translate.refresh();
-                }]
             },
             onEnter: ['JhiTrackerService', function(JhiTrackerService) {
                 JhiTrackerService.subscribe();

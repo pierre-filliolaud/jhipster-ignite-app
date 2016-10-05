@@ -1,87 +1,69 @@
 package com.mycompany.myapp.config;
 
-import com.mycompany.myapp.config.oauth2.OAuth2AuthenticationReadConverter;
-import com.mycompany.myapp.domain.util.JSR310DateConverters.*;
-import com.mongodb.Mongo;
-import com.github.mongobee.Mongobee;
+import com.mycompany.myapp.config.liquibase.AsyncSpringLiquibase;
+
+import com.fasterxml.jackson.datatype.hibernate4.Hibernate4Module;
+import liquibase.integration.spring.SpringLiquibase;
+import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoProperties;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
-import org.springframework.data.mongodb.config.EnableMongoAuditing;
-import org.springframework.data.mongodb.core.convert.CustomConversions;
-import org.springframework.data.mongodb.core.convert.CustomConversions;
-import org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventListener;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
+import javax.sql.DataSource;
+import java.sql.SQLException;
 
 @Configuration
-@Profile("!" + Constants.SPRING_PROFILE_CLOUD)
-@EnableMongoRepositories("com.mycompany.myapp.repository")
-@Import(value = MongoAutoConfiguration.class)
-@EnableMongoAuditing(auditorAwareRef = "springSecurityAuditorAware")
-public class DatabaseConfiguration extends AbstractMongoConfiguration {
+@EnableJpaRepositories("com.mycompany.myapp.repository")
+@EnableJpaAuditing(auditorAwareRef = "springSecurityAuditorAware")
+@EnableTransactionManagement
+public class DatabaseConfiguration {
 
     private final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);
 
     @Inject
-    private Mongo mongo;
+    private Environment env;
 
-    @Inject
-    private MongoProperties mongoProperties;
-
-    @Bean
-    public ValidatingMongoEventListener validatingMongoEventListener() {
-        return new ValidatingMongoEventListener(validator());
+    /**
+     * Open the TCP port for the H2 database, so it is available remotely.
+     *
+     * @return the H2 database TCP server
+     * @throws SQLException if the server failed to start
+     */
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    @Profile(Constants.SPRING_PROFILE_DEVELOPMENT)
+    public Server h2TCPServer() throws SQLException {
+        return Server.createTcpServer("-tcp","-tcpAllowOthers");
     }
 
     @Bean
-    public LocalValidatorFactoryBean validator() {
-        return new LocalValidatorFactoryBean();
-    }
+    public SpringLiquibase liquibase(DataSource dataSource, LiquibaseProperties liquibaseProperties) {
 
-    @Override
-    protected String getDatabaseName() {
-        return mongoProperties.getDatabase();
-    }
-
-    @Override
-    public Mongo mongo() throws Exception {
-        return mongo;
-    }
-
-    @Bean
-    public CustomConversions customConversions() {
-        List<Converter<?, ?>> converters = new ArrayList<>();
-        converters.add(new OAuth2AuthenticationReadConverter());
-        converters.add(DateToZonedDateTimeConverter.INSTANCE);
-        converters.add(ZonedDateTimeToDateConverter.INSTANCE);
-        converters.add(DateToLocalDateConverter.INSTANCE);
-        converters.add(LocalDateToDateConverter.INSTANCE);
-        converters.add(DateToLocalDateTimeConverter.INSTANCE);
-        converters.add(LocalDateTimeToDateConverter.INSTANCE);
-        return new CustomConversions(converters);
+        // Use liquibase.integration.spring.SpringLiquibase if you don't want Liquibase to start asynchronously
+        SpringLiquibase liquibase = new AsyncSpringLiquibase();
+        liquibase.setDataSource(dataSource);
+        liquibase.setChangeLog("classpath:config/liquibase/master.xml");
+        liquibase.setContexts(liquibaseProperties.getContexts());
+        liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
+        liquibase.setDropFirst(liquibaseProperties.isDropFirst());
+        if (env.acceptsProfiles(Constants.SPRING_PROFILE_NO_LIQUIBASE)) {
+            liquibase.setShouldRun(false);
+        } else {
+            liquibase.setShouldRun(liquibaseProperties.isEnabled());
+            log.debug("Configuring Liquibase");
+        }
+        return liquibase;
     }
 
     @Bean
-    public Mongobee mongobee() {
-        log.debug("Configuring Mongobee");
-        Mongobee mongobee = new Mongobee(mongo);
-        mongobee.setDbName(mongoProperties.getDatabase());
-        // package to scan for migrations
-        mongobee.setChangeLogsScanPackage("com.mycompany.myapp.config.dbmigrations");
-        mongobee.setEnabled(true);
-        return mongobee;
+    public Hibernate4Module hibernate4Module() {
+        return new Hibernate4Module();
     }
 }

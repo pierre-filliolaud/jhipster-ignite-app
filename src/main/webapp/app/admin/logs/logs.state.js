@@ -13,7 +13,7 @@
             url: '/logs',
             data: {
                 authorities: ['ROLE_ADMIN'],
-                pageTitle: 'logs.title'
+                pageTitle: 'Logs'
             },
             views: {
                 'content@': {
@@ -21,12 +21,6 @@
                     controller: 'LogsController',
                     controllerAs: 'vm'
                 }
-            },
-            resolve: {
-                translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
-                    $translatePartialLoader.addPart('logs');
-                    return $translate.refresh();
-                }]
             }
         });
     }

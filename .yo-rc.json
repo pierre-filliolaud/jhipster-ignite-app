@@ -6,12 +6,12 @@
     "packageFolder": "com/mycompany/myapp",
     "serverPort": "8080",
     "authenticationType": "oauth2",
-    "hibernateCache": "no",
+    "hibernateCache": "hazelcast",
     "clusteredHttpSession": false,
     "websocket": "spring-websocket",
-    "databaseType": "mongodb",
-    "devDatabaseType": "mongodb",
-    "prodDatabaseType": "mongodb",
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "prodDatabaseType": "postgresql",
     "searchEngine": false,
     "messageBroker": false,
     "buildTool": "maven",
@@ -22,10 +22,6 @@
       "gatling"
     ],
     "jhiPrefix": "jhi",
-    "enableTranslation": true,
-    "nativeLanguage": "en",
-    "languages": [
-      "en"
-    ]
+    "enableTranslation": false
   }
 }

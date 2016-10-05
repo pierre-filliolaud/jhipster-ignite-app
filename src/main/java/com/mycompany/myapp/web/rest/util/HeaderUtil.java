@@ -19,21 +19,21 @@ public class HeaderUtil {
     }
 
     public static HttpHeaders createEntityCreationAlert(String entityName, String param) {
-        return createAlert("ignitejhipsterApp." + entityName + ".created", param);
+        return createAlert("A new " + entityName + " is created with identifier " + param, param);
     }
 
     public static HttpHeaders createEntityUpdateAlert(String entityName, String param) {
-        return createAlert("ignitejhipsterApp." + entityName + ".updated", param);
+        return createAlert("A " + entityName + " is updated with identifier " + param, param);
     }
 
     public static HttpHeaders createEntityDeletionAlert(String entityName, String param) {
-        return createAlert("ignitejhipsterApp." + entityName + ".deleted", param);
+        return createAlert("A " + entityName + " is deleted with identifier " + param, param);
     }
 
     public static HttpHeaders createFailureAlert(String entityName, String errorKey, String defaultMessage) {
         log.error("Entity creation failed, {}", defaultMessage);
         HttpHeaders headers = new HttpHeaders();
-        headers.add("X-ignitejhipsterApp-error", "error." + errorKey);
+        headers.add("X-ignitejhipsterApp-error", defaultMessage);
         headers.add("X-ignitejhipsterApp-params", entityName);
         return headers;
     }

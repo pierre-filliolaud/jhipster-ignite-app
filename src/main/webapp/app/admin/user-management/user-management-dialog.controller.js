@@ -5,9 +5,9 @@
         .module('ignitejhipsterApp')
         .controller('UserManagementDialogController',UserManagementDialogController);
 
-    UserManagementDialogController.$inject = ['$stateParams', '$uibModalInstance', 'entity', 'User', 'JhiLanguageService'];
+    UserManagementDialogController.$inject = ['$stateParams', '$uibModalInstance', 'entity', 'User'];
 
-    function UserManagementDialogController ($stateParams, $uibModalInstance, entity, User, JhiLanguageService) {
+    function UserManagementDialogController ($stateParams, $uibModalInstance, entity, User) {
         var vm = this;
 
         vm.authorities = ['ROLE_USER', 'ROLE_ADMIN'];
@@ -17,9 +17,6 @@
         vm.user = entity;
 
 
-        JhiLanguageService.getAll().then(function (languages) {
-            vm.languages = languages;
-        });
 
         function clear () {
             $uibModalInstance.dismiss('cancel');
@@ -39,6 +36,7 @@
             if (vm.user.id !== null) {
                 User.update(vm.user, onSaveSuccess, onSaveError);
             } else {
+                vm.user.langKey = 'en';
                 User.save(vm.user, onSaveSuccess, onSaveError);
             }
         }

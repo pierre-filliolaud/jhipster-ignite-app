@@ -5,13 +5,13 @@
         .module('ignitejhipsterApp')
         .directive('pageRibbon', pageRibbon);
 
-    pageRibbon.$inject = ['ProfileService', '$rootScope', '$translate'];
+    pageRibbon.$inject = ['ProfileService', '$rootScope'];
 
-    function pageRibbon(ProfileService, $rootScope, $translate) {
+    function pageRibbon(ProfileService, $rootScope) {
         var directive = {
             replace : true,
             restrict : 'AE',
-            template : '<div class="ribbon hidden"><a href="" translate="global.ribbon.{{ribbonEnv}}">{{ribbonEnv}}</a></div>',
+            template : '<div class="ribbon hidden"><a href="" >{{ribbonEnv}}</a></div>',
             link : linkFunc
         };
 

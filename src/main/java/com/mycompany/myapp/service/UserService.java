@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import javax.inject.Inject;
@@ -22,12 +24,16 @@ import java.util.*;
  * Service class for managing users.
  */
 @Service
+@Transactional
 public class UserService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Inject
     private PasswordEncoder passwordEncoder;
+
+    @Inject
+    public JdbcTokenStore jdbcTokenStore;
 
     @Inject
     private UserRepository userRepository;
@@ -140,7 +146,7 @@ public class UserService {
         });
     }
 
-    public void updateUser(String id, String login, String firstName, String lastName, String email,
+    public void updateUser(Long id, String login, String firstName, String lastName, String email,
         boolean activated, String langKey, Set<String> authorities) {
 
         userRepository
@@ -157,12 +163,13 @@ public class UserService {
                 authorities.stream().forEach(
                     authority -> managedAuthorities.add(authorityRepository.findOne(authority))
                 );
-                userRepository.save(u);
                 log.debug("Changed Information for User: {}", u);
             });
     }
 
     public void deleteUser(String login) {
+        jdbcTokenStore.findTokensByUserName(login).stream().forEach(token ->
+            jdbcTokenStore.removeAccessToken(token));
         userRepository.findOneByLogin(login).ifPresent(u -> {
             userRepository.delete(u);
             log.debug("Deleted User: {}", u);
@@ -178,20 +185,28 @@ public class UserService {
         });
     }
 
+    @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthoritiesByLogin(String login) {
-        return userRepository.findOneByLogin(login);
+        return userRepository.findOneByLogin(login).map(u -> {
+            u.getAuthorities().size();
+            return u;
+        });
     }
 
-    public User getUserWithAuthorities(String id) {
+    @Transactional(readOnly = true)
+    public User getUserWithAuthorities(Long id) {
         User user = userRepository.findOne(id);
+        user.getAuthorities().size(); // eagerly load the association
         return user;
     }
 
+    @Transactional(readOnly = true)
     public User getUserWithAuthorities() {
         Optional<User> optionalUser = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin());
         User user = null;
         if (optionalUser.isPresent()) {
           user = optionalUser.get();
+            user.getAuthorities().size(); // eagerly load the association
          }
          return user;
     }

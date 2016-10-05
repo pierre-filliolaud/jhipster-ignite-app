@@ -13,7 +13,7 @@
             url: '/health',
             data: {
                 authorities: ['ROLE_ADMIN'],
-                pageTitle: 'health.title'
+                pageTitle: 'Health Checks'
             },
             views: {
                 'content@': {
@@ -21,12 +21,6 @@
                     controller: 'JhiHealthCheckController',
                     controllerAs: 'vm'
                 }
-            },
-            resolve: {
-                translatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
-                    $translatePartialLoader.addPart('health');
-                    return $translate.refresh();
-                }]
             }
         });
     }

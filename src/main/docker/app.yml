@@ -3,15 +3,14 @@ services:
     ignitejhipster-app:
         image: ignitejhipster
         external_links:
-            - ignitejhipster-mongodb:mongodb
+            - ignitejhipster-postgresql:postgresql
         environment:
             - SPRING_PROFILES_ACTIVE=prod,swagger
-            - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017
-            - SPRING_DATA_MONGODB_DATABASE=ignitejhipster
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/ignitejhipster
             - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
         ports:
             - 8080:8080
-    ignitejhipster-mongodb:
+    ignitejhipster-postgresql:
         extends:
-            file: mongodb.yml
-            service: ignitejhipster-mongodb
+            file: postgresql.yml
+            service: ignitejhipster-postgresql

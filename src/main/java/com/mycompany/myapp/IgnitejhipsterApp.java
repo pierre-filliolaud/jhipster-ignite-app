@@ -23,7 +23,7 @@ import java.util.Collection;
 
 @ComponentScan
 @EnableAutoConfiguration(exclude = { MetricFilterAutoConfiguration.class, MetricRepositoryAutoConfiguration.class })
-@EnableConfigurationProperties({ JHipsterProperties.class })
+@EnableConfigurationProperties({ JHipsterProperties.class, LiquibaseProperties.class })
 public class IgnitejhipsterApp {
 
     private static final Logger log = LoggerFactory.getLogger(IgnitejhipsterApp.class);

@@ -14,21 +14,19 @@
         .module('ignitejhipsterApp')
         .component('jhiAlertError', jhiAlertError);
 
-    jhiAlertErrorController.$inject = ['$scope', 'AlertService', '$rootScope', '$translate'];
+    jhiAlertErrorController.$inject = ['$scope', 'AlertService', '$rootScope'];
 
-    function jhiAlertErrorController ($scope, AlertService, $rootScope, $translate) {
+    function jhiAlertErrorController ($scope, AlertService, $rootScope) {
         var vm = this;
 
         vm.alerts = [];
 
         function addErrorAlert (message, key, data) {
-            key = key ? key : message;
             vm.alerts.push(
                 AlertService.add(
                     {
                         type: 'danger',
-                        msg: key,
-                        params: data,
+                        msg: message,
                         timeout: 5000,
                         toast: AlertService.isToast(),
                         scoped: true
@@ -51,14 +49,14 @@
                 var errorHeader = httpResponse.headers('X-ignitejhipsterApp-error');
                 var entityKey = httpResponse.headers('X-ignitejhipsterApp-params');
                 if (errorHeader) {
-                    var entityName = $translate.instant('global.menu.entities.' + entityKey);
+                    var entityName = entityKey;
                     addErrorAlert(errorHeader, errorHeader, {entityName: entityName});
                 } else if (httpResponse.data && httpResponse.data.fieldErrors) {
                     for (i = 0; i < httpResponse.data.fieldErrors.length; i++) {
                         var fieldError = httpResponse.data.fieldErrors[i];
                         // convert 'something[14].other[4].id' to 'something[].other[].id' so translations can be written to it
                         var convertedField = fieldError.field.replace(/\[\d*\]/g, '[]');
-                        var fieldName = $translate.instant('ignitejhipsterApp.' + fieldError.objectName + '.' + convertedField);
+                        var fieldName = convertedField.charAt(0).toUpperCase() + convertedField.slice(1);
                         addErrorAlert('Field ' + fieldName + ' cannot be empty', 'error.' + fieldError.message, {fieldName: fieldName});
                     }
                 } else if (httpResponse.data && httpResponse.data.message) {
