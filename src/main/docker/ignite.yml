@@ -1,0 +1,8 @@
+version: '2'
+services:
+    ignite:
+        container_name: ignite
+        image: apacheignite/ignite:1.7.0
+        ports:
+            - "47100:47100"
+            - "48100:48100"

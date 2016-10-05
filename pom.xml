@@ -50,6 +50,7 @@
         <spring-security.version>4.1.0.RELEASE</spring-security.version>
         <spring-security-oauth2.version>2.0.9.RELEASE</spring-security-oauth2.version>
         <springfox.version>2.5.0</springfox.version>
+        <ignite.version>1.7.0</ignite.version>
         <!-- Sonar properties -->
         <project.testresult.directory>${project.build.directory}/test-results</project.testresult.directory>
         <sonar-maven-plugin.version>3.0.2</sonar-maven-plugin.version>
@@ -399,6 +400,21 @@
             <version>${metrics-spark-reporter.version}</version>
         </dependency>
         <!-- jhipster-needle-maven-add-dependency -->
+        <dependency>
+    		    <groupId>org.apache.ignite</groupId>
+    		    <artifactId>ignite-core</artifactId>
+    		    <version>${ignite.version}</version>
+    		</dependency>
+    		<dependency>
+    		    <groupId>org.apache.ignite</groupId>
+    		    <artifactId>ignite-spring</artifactId>
+    		    <version>${ignite.version}</version>
+    		</dependency>
+    		<dependency>
+    		    <groupId>org.apache.ignite</groupId>
+    		    <artifactId>ignite-indexing</artifactId>
+    		    <version>${ignite.version}</version>
+    		</dependency>
     </dependencies>
     <build>
         <defaultGoal>spring-boot:run</defaultGoal>
